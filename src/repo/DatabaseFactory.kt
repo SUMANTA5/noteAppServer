@@ -13,14 +13,13 @@ object DatabaseFactory {
 
     fun init(){
         Database.connect(hikari())
-
         transaction {
             SchemaUtils.create(UserTable)
         }
     }
 
 
-    fun hikari(): HikariDataSource {
+    private fun hikari(): HikariDataSource {
         val config = HikariConfig()
         config.driverClassName = System.getenv("JDBC_DRIVER") // 1
         config.jdbcUrl = System.getenv("DATABASE_URL") // 2

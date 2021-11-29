@@ -11,7 +11,6 @@ class Repo {
 
     suspend fun addUser(user: User){
         dbQuery {
-
             UserTable.insert { ut->
                 ut[UserTable.email] = user.email
                 ut[UserTable.hashPassword] = user.hashPassword

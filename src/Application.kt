@@ -1,6 +1,11 @@
 package com.example
 
+import com.example.auth.JwtService
+import com.example.auth.hash
+import com.example.data.model.User
 import com.example.repo.DatabaseFactory
+import com.example.repo.Repo
+import com.example.routes.userRoutes
 import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.request.*
@@ -10,6 +15,7 @@ import io.ktor.sessions.*
 import io.ktor.auth.*
 import io.ktor.gson.*
 import io.ktor.features.*
+import io.ktor.locations.*
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -18,11 +24,17 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 fun Application.module(testing: Boolean = false) {
 
     DatabaseFactory.init()
+    val db = Repo()
+    val jwtService = JwtService()
+    val hashFunction = {s:String -> hash(s)}
 
     install(Sessions) {
         cookie<MySession>("MY_SESSION") {
             cookie.extensions["SameSite"] = "lax"
         }
+    }
+
+    install(Locations) {
     }
 
     install(Authentication) {
@@ -38,6 +50,7 @@ fun Application.module(testing: Boolean = false) {
         get("/") {
             call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
         }
+        userRoutes(db, jwtService, hashFunction)
     }
 }
 
