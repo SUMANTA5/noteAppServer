@@ -28,7 +28,7 @@ class UserLoginRoute
 fun Route.userRoutes(
     db: Repo,
     jwtService: JwtService,
-    hashFunction: (String) -> String
+    hashFunction: (String)->String
 ){
     post<UserRegisterRoute>{
         val registerRequest = try {
