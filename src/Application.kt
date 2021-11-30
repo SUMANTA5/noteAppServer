@@ -1,10 +1,12 @@
 package com.example
 
+import com.auth0.jwt.interfaces.Payload
 import com.example.auth.JwtService
 import com.example.auth.hash
 import com.example.data.model.User
 import com.example.repo.DatabaseFactory
 import com.example.repo.Repo
+import com.example.routes.noteRoute
 import com.example.routes.userRoutes
 import io.ktor.application.*
 import io.ktor.response.*
@@ -13,6 +15,7 @@ import io.ktor.routing.*
 import io.ktor.http.*
 import io.ktor.sessions.*
 import io.ktor.auth.*
+import io.ktor.auth.jwt.*
 import io.ktor.gson.*
 import io.ktor.features.*
 import io.ktor.locations.*
@@ -38,6 +41,18 @@ fun Application.module(testing: Boolean = false) {
     }
 
     install(Authentication) {
+        jwt("jwt"){
+            verifier(jwtService.varifier)
+            realm = "Note Server"
+            validate {
+                val payload = it.payload
+                val email = payload.getClaim("email").asString()
+                val user = db.findUserByEmail(email)
+                user
+            }
+        }
+
+
     }
 
     install(ContentNegotiation) {
@@ -51,6 +66,7 @@ fun Application.module(testing: Boolean = false) {
             call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
         }
         userRoutes(db, jwtService, hashFunction)
+        noteRoute(db, hashFunction)
     }
 }
 
