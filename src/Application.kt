@@ -29,7 +29,7 @@ fun Application.module(testing: Boolean = false) {
     DatabaseFactory.init()
     val db = Repo()
     val jwtService = JwtService()
-    val hashFunction = {s:String -> hash(s)}
+    val hashFunction = { s: String -> hash(s) }
 
     install(Sessions) {
         cookie<MySession>("MY_SESSION") {
@@ -41,7 +41,7 @@ fun Application.module(testing: Boolean = false) {
     }
 
     install(Authentication) {
-        jwt("jwt"){
+        jwt("jwt") {
             verifier(jwtService.varifier)
             realm = "Note Server"
             validate {

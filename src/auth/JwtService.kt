@@ -15,11 +15,11 @@ class JwtService {
         .withIssuer(issuer)
         .build()
 
-    fun generateToken(user: User): String{
+    fun generateToken(user: User): String {
         return JWT.create()
             .withSubject("NOteAuthentication")
             .withIssuer(issuer)
-            .withClaim("email",user.email)
+            .withClaim("email", user.email)
             .sign(algorithm)
     }
 

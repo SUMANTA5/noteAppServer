@@ -28,14 +28,16 @@ class UserLoginRoute
 fun Route.userRoutes(
     db: Repo,
     jwtService: JwtService,
-    hashFunction: (String)->String
-){
-    post<UserRegisterRoute>{
+    hashFunction: (String) -> String
+) {
+    post<UserRegisterRoute> {
         val registerRequest = try {
             call.receive<RegisterRequest>()
-        }catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest,
-                SimpleResponse(false,"Missing Some Field"))
+        } catch (e: Exception) {
+            call.respond(
+                HttpStatusCode.BadRequest,
+                SimpleResponse(false, "Missing Some Field")
+            )
             return@post
         }
 
@@ -46,35 +48,41 @@ fun Route.userRoutes(
                 registerRequest.name
             )
             db.addUser(user)
-            call.respond(HttpStatusCode.OK, SimpleResponse(true,jwtService.generateToken(user)))
+            call.respond(HttpStatusCode.OK, SimpleResponse(true, jwtService.generateToken(user)))
 
-        }catch (e: Exception) {
-            call.respond(HttpStatusCode.Conflict,SimpleResponse(false,e.message ?: "some Problem"))
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.Conflict, SimpleResponse(false, e.message ?: "some Problem"))
         }
     }
 
-    post<UserLoginRoute>{
+    post<UserLoginRoute> {
         val loginRoute = try {
             call.receive<LoginRequest>()
-        }catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest,
-                SimpleResponse(false,"Missing Some Field"))
+        } catch (e: Exception) {
+            call.respond(
+                HttpStatusCode.BadRequest,
+                SimpleResponse(false, "Missing Some Field")
+            )
             return@post
         }
         try {
             val user = db.findUserByEmail(loginRoute.email)
-            if (user == null){
-                call.respond(HttpStatusCode.BadRequest,
-                    SimpleResponse(false,"Wrong Email Id"))
-            }else{
-                if (user.hashPassword == hashFunction(loginRoute.password)){
-                    call.respond(HttpStatusCode.OK,SimpleResponse(true,jwtService.generateToken(user)))
-                }else{
-                    call.respond(HttpStatusCode.BadRequest,
-                        SimpleResponse(false,"Password Incorrect!"))
+            if (user == null) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    SimpleResponse(false, "Wrong Email Id")
+                )
+            } else {
+                if (user.hashPassword == hashFunction(loginRoute.password)) {
+                    call.respond(HttpStatusCode.OK, SimpleResponse(true, jwtService.generateToken(user)))
+                } else {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        SimpleResponse(false, "Password Incorrect!")
+                    )
                 }
             }
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             call.respond(
                 HttpStatusCode.Conflict,
                 SimpleResponse(false, e.message ?: "some Problem")
